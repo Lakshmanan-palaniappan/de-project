@@ -1,0 +1,117 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dataingestpip"
+		},
+		"Travelon_Server_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Travelon_Server'"
+		},
+		"Travelon_Server_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "103.207.1.87"
+		},
+		"Travelon_Server_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Travelon"
+		},
+		"Travelon_Server_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "codesages"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Travelon_Server')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('Travelon_Server_properties_typeProperties_server')]",
+					"database": "[parameters('Travelon_Server_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Travelon_Server_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Travelon_Server_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/livelocationTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "TouristId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EstimatedLat",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "EstimatedLng",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "Accuracy",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "Source",
+						"type": "varchar"
+					},
+					{
+						"name": "UpdatedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "IsInsideGeofence",
+						"type": "bit"
+					},
+					{
+						"name": "DistanceMeters",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonTrilateration",
+					"table": "LatestTrilateration"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		}
+	]
+}

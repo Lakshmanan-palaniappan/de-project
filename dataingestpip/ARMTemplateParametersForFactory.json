@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "dataingestpip"
+		},
+		"Travelon_Server_password": {
+			"value": ""
+		},
+		"Travelon_Server_properties_typeProperties_server": {
+			"value": "103.207.1.87"
+		},
+		"Travelon_Server_properties_typeProperties_database": {
+			"value": "Travelon"
+		},
+		"Travelon_Server_properties_typeProperties_userName": {
+			"value": "codesages"
+		}
+	}
+}
