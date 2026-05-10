@@ -1,0 +1,27 @@
+{
+	"name": "ds_sql_query",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "pipeline_name",
+				"type": "varchar"
+			},
+			{
+				"name": "last_watermark",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "pipeline_watermark"
+		}
+	}
+}

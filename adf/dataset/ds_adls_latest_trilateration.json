@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "latest_trilateration",
+				"folderPath": "latest_trilateration/year=@{formatDateTime(utcNow(),'yyyy')}/month=@{formatDateTime(utcNow(),'MM')}/day=@{formatDateTime(utcNow(),'dd')}",
 				"fileSystem": "bronze"
 			},
 			"compressionCodec": "snappy"
