@@ -1,0 +1,52 @@
+{
+	"name": "ds_sql_schedule",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ScheduleId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TripRequestId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PlaceId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ScheduledDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Status",
+				"type": "varchar"
+			},
+			{
+				"name": "StartTime",
+				"type": "time",
+				"scale": 7
+			},
+			{
+				"name": "EndTime",
+				"type": "time",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonLocation",
+			"table": "TripSchedule"
+		}
+	}
+}

@@ -1,0 +1,58 @@
+{
+	"name": "ds_sql_agency",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "AgencyId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AgencyName",
+				"type": "varchar"
+			},
+			{
+				"name": "OwnerName",
+				"type": "varchar"
+			},
+			{
+				"name": "Contact",
+				"type": "varchar"
+			},
+			{
+				"name": "EmailId",
+				"type": "varchar"
+			},
+			{
+				"name": "LicenseNo",
+				"type": "varchar"
+			},
+			{
+				"name": "LicenseURL",
+				"type": "varchar"
+			},
+			{
+				"name": "DateOfStarting",
+				"type": "date"
+			},
+			{
+				"name": "AddressInfo",
+				"type": "varchar"
+			},
+			{
+				"name": "PasswordHash",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonCore",
+			"table": "Agency"
+		}
+	}
+}

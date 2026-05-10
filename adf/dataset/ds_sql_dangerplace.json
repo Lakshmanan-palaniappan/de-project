@@ -1,0 +1,86 @@
+{
+	"name": "ds_sql_dangerplace",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "DangerPlaceId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Description",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Latitude",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "Longitude",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "RadiusMeters",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Severity",
+				"type": "varchar"
+			},
+			{
+				"name": "AlertMessage",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ValidFrom",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ValidTo",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "IsActive",
+				"type": "bit"
+			},
+			{
+				"name": "CreatedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "UpdatedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "AgencyId",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonLocation",
+			"table": "DangerPlace"
+		}
+	}
+}
