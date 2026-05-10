@@ -1,0 +1,168 @@
+{
+	"name": "pl_incremental_geofence_alert",
+	"properties": {
+		"activities": [
+			{
+				"name": "lkp_get_watermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT last_watermark\nFROM pipeline_watermark\nWHERE pipeline_name='geofence_alert_pipeline'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_query",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "cpy_geofence",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "lkp_get_watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "SELECT *\nFROM TravelonAlertSecurity.GeofenceAlert\nWHERE CreatedAt >\n'@{activity('lkp_get_watermark').output.firstRow.last_watermark}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"isolationLevel": "ReadCommitted",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sql_geofence_alert",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_geofence_alert",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "lkp_max_created_time",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "cpy_geofence",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT MAX(CreatedAt) AS max_time\nFROM TravelonAlertSecurity.GeofenceAlert",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_location",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "sp_update_watermark",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "lkp_max_created_time",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_update_watermark]",
+					"storedProcedureParameters": {
+						"new_watermark": {
+							"value": {
+								"value": "@{activity('lkp_max_created_time').output.firstRow.max_time}",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"pipeline_name": {
+							"value": "geofence_alert_pipeline",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
