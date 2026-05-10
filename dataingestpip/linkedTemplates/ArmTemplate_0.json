@@ -139,7 +139,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"folderPath": "geofence_alert",
+						"folderPath": "geofence_alert/year=@{formatDateTime(utcNow(),'yyyy')}/month=@{formatDateTime(utcNow(),'MM')}/day=@{formatDateTime(utcNow(),'dd')}",
 						"fileSystem": "bronze"
 					},
 					"compressionCodec": "snappy"
@@ -1275,33 +1275,187 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/master_pl_trigger')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
+			"name": "[concat(parameters('factoryName'), '/pl_incremental_geofence_alert')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
+				"activities": [
 					{
-						"pipelineReference": {
-							"referenceName": "pl_master_ingestion",
-							"type": "PipelineReference"
+						"name": "lkp_get_watermark",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
 						},
-						"parameters": {}
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT last_watermark\nFROM pipeline_watermark\nWHERE pipeline_name='geofence_alert_pipeline'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_sql_query",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "cpy_geofence",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "lkp_get_watermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": {
+									"value": "SELECT *\nFROM TravelonAlertSecurity.GeofenceAlert\nWHERE CreatedAt >\n'@{activity('lkp_get_watermark').output.firstRow.last_watermark}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"isolationLevel": "ReadCommitted",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "FlattenHierarchy"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_sql_geofence_alert",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_adls_geofence_alert",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "lkp_max_created_time",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "cpy_geofence",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT MAX(CreatedAt) AS max_time\nFROM TravelonAlertSecurity.GeofenceAlert",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_sql_location",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "sp_update_watermark",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "lkp_max_created_time",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_update_watermark]",
+							"storedProcedureParameters": {
+								"new_watermark": {
+									"value": {
+										"value": "@{activity('lkp_max_created_time').output.firstRow.max_time}",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"pipeline_name": {
+									"value": "geofence_alert_pipeline",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Server",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 6,
-						"startTime": "2026-05-10T00:00:00",
-						"timeZone": "India Standard Time"
-					}
-				}
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_master_ingestion')]"
+				"[concat(variables('factoryId'), '/datasets/ds_sql_query')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sql_geofence_alert')]",
+				"[concat(variables('factoryId'), '/datasets/ds_adls_geofence_alert')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sql_location')]",
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
 			]
 		}
 	]
