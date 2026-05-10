@@ -1,0 +1,70 @@
+{
+	"name": "ds_sql_geofence_alert",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "AlertId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TouristId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PlaceId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DistanceMeters",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AlertType",
+				"type": "varchar"
+			},
+			{
+				"name": "Severity",
+				"type": "varchar"
+			},
+			{
+				"name": "Message",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsResolved",
+				"type": "bit"
+			},
+			{
+				"name": "ResolvedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ResolvedByEmployeeId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CreatedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonAlertSecurity",
+			"table": "GeofenceAlert"
+		}
+	}
+}

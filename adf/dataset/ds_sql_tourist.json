@@ -1,0 +1,84 @@
+{
+	"name": "ds_sql_tourist",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "TouristId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Nationality",
+				"type": "varchar"
+			},
+			{
+				"name": "Contact",
+				"type": "varchar"
+			},
+			{
+				"name": "Email",
+				"type": "varchar"
+			},
+			{
+				"name": "Gender",
+				"type": "varchar"
+			},
+			{
+				"name": "KycType",
+				"type": "varchar"
+			},
+			{
+				"name": "KYCHash",
+				"type": "varchar"
+			},
+			{
+				"name": "EmergencyContact",
+				"type": "varchar"
+			},
+			{
+				"name": "Address",
+				"type": "varchar"
+			},
+			{
+				"name": "PasswordHash",
+				"type": "varchar"
+			},
+			{
+				"name": "AgencyId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "KycURL",
+				"type": "varchar"
+			},
+			{
+				"name": "UserType",
+				"type": "varchar"
+			},
+			{
+				"name": "PrimaryDeviceId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "KycLast4",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonCore",
+			"table": "Tourist"
+		}
+	}
+}
