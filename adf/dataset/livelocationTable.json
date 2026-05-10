@@ -1,0 +1,58 @@
+{
+	"name": "livelocationTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "TouristId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "EstimatedLat",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "EstimatedLng",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "Accuracy",
+				"type": "float",
+				"precision": 15
+			},
+			{
+				"name": "Source",
+				"type": "varchar"
+			},
+			{
+				"name": "UpdatedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "IsInsideGeofence",
+				"type": "bit"
+			},
+			{
+				"name": "DistanceMeters",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonTrilateration",
+			"table": "LatestTrilateration"
+		}
+	}
+}
