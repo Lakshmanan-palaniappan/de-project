@@ -51,7 +51,236 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/livelocationTable')]",
+			"name": "[concat(parameters('factoryName'), '/ds_sql_agency')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "AgencyId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AgencyName",
+						"type": "varchar"
+					},
+					{
+						"name": "OwnerName",
+						"type": "varchar"
+					},
+					{
+						"name": "Contact",
+						"type": "varchar"
+					},
+					{
+						"name": "EmailId",
+						"type": "varchar"
+					},
+					{
+						"name": "LicenseNo",
+						"type": "varchar"
+					},
+					{
+						"name": "LicenseURL",
+						"type": "varchar"
+					},
+					{
+						"name": "DateOfStarting",
+						"type": "date"
+					},
+					{
+						"name": "AddressInfo",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonCore",
+					"table": "Agency"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_dangerplace')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "DangerPlaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Description",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Latitude",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "Longitude",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "RadiusMeters",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Severity",
+						"type": "varchar"
+					},
+					{
+						"name": "AlertMessage",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ValidFrom",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ValidTo",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "IsActive",
+						"type": "bit"
+					},
+					{
+						"name": "CreatedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "UpdatedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "AgencyId",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonLocation",
+					"table": "DangerPlace"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_geofence_alert')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "AlertId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TouristId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PlaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DistanceMeters",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AlertType",
+						"type": "varchar"
+					},
+					{
+						"name": "Severity",
+						"type": "varchar"
+					},
+					{
+						"name": "Message",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IsResolved",
+						"type": "bit"
+					},
+					{
+						"name": "ResolvedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ResolvedByEmployeeId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CreatedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonAlertSecurity",
+					"table": "GeofenceAlert"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_location')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -107,6 +336,211 @@
 				"typeProperties": {
 					"schema": "TravelonTrilateration",
 					"table": "LatestTrilateration"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_schedule')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "ScheduleId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TripRequestId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PlaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ScheduledDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "StartTime",
+						"type": "time",
+						"scale": 7
+					},
+					{
+						"name": "EndTime",
+						"type": "time",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonLocation",
+					"table": "TripSchedule"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_tourist')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "TouristId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "Nationality",
+						"type": "varchar"
+					},
+					{
+						"name": "Contact",
+						"type": "varchar"
+					},
+					{
+						"name": "Email",
+						"type": "varchar"
+					},
+					{
+						"name": "Gender",
+						"type": "varchar"
+					},
+					{
+						"name": "KycType",
+						"type": "varchar"
+					},
+					{
+						"name": "KYCHash",
+						"type": "varchar"
+					},
+					{
+						"name": "EmergencyContact",
+						"type": "varchar"
+					},
+					{
+						"name": "Address",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					},
+					{
+						"name": "AgencyId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "KycURL",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "PrimaryDeviceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "KycLast4",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonCore",
+					"table": "Tourist"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_trip')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "TripId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TouristId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AgencyId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AssignedEmployeeId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StartDate",
+						"type": "date"
+					},
+					{
+						"name": "EndDate",
+						"type": "date"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "RequestId",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonCore",
+					"table": "Trip"
 				}
 			},
 			"dependsOn": [
