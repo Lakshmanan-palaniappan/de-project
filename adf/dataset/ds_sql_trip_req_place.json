@@ -1,0 +1,32 @@
+{
+	"name": "ds_sql_trip_req_place",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Travelon_Server",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "RequestPlaceId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "RequestId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PlaceId",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "TravelonLocation",
+			"table": "TripRequestPlaces"
+		}
+	}
+}
