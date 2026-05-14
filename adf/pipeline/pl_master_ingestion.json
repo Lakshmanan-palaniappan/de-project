@@ -284,6 +284,60 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "module_2_silver",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "cpy_danger_place",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/silver/silver_layer_module2"
+				},
+				"linkedServiceName": {
+					"referenceName": "Travelon_Databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "module_2_gold",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "module_2_silver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/gold/gold_layer_module2"
+				},
+				"linkedServiceName": {
+					"referenceName": "Travelon_Databricks",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"annotations": []
