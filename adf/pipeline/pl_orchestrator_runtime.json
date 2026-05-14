@@ -1,0 +1,78 @@
+{
+	"name": "pl_orchestrator_runtime",
+	"properties": {
+		"activities": [
+			{
+				"name": "latest_location",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_incremental_latest_location",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "module_1_silver",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "latest_location",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/silver/silver_module_1.py"
+				},
+				"linkedServiceName": {
+					"referenceName": "Travelon_Databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "module_1_gold",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "module_1_silver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/gold/gold_module_1"
+				},
+				"linkedServiceName": {
+					"referenceName": "Travelon_Databricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
