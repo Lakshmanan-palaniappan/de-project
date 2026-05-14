@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "dataingestpip"
 		},
+		"Travelon_Databricks_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'Travelon_Databricks'"
+		},
 		"Travelon_Server_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Travelon_Server'"
@@ -14,6 +18,10 @@
 		"ls_adls_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ls_adls'"
+		},
+		"Travelon_Databricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0514-110411-uzwfft7v"
 		},
 		"Travelon_Server_properties_typeProperties_server": {
 			"type": "string",
@@ -58,11 +66,17 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"Travelon_Databricks_accessToken": {
+						"value": "[parameters('Travelon_Databricks_accessToken')]"
+					},
 					"Travelon_Server_password": {
 						"value": "[parameters('Travelon_Server_password')]"
 					},
 					"ls_adls_accountKey": {
 						"value": "[parameters('ls_adls_accountKey')]"
+					},
+					"Travelon_Databricks_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('Travelon_Databricks_properties_typeProperties_existingClusterId')]"
 					},
 					"Travelon_Server_properties_typeProperties_server": {
 						"value": "[parameters('Travelon_Server_properties_typeProperties_server')]"

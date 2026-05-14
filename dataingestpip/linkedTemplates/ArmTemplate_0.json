@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "dataingestpip"
 		},
+		"Travelon_Databricks_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'Travelon_Databricks'"
+		},
 		"Travelon_Server_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Travelon_Server'"
@@ -14,6 +18,10 @@
 		"ls_adls_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'ls_adls'"
+		},
+		"Travelon_Databricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0514-110411-uzwfft7v"
 		},
 		"Travelon_Server_properties_typeProperties_server": {
 			"type": "string",
@@ -36,6 +44,24 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Travelon_Databricks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405606182041361.1.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('Travelon_Databricks_accessToken')]"
+					},
+					"existingClusterId": "[parameters('Travelon_Databricks_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Travelon_Server')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -829,70 +855,6 @@
 				"typeProperties": {
 					"schema": "TravelonCore",
 					"table": "Trip"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Travelon_Server')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_sql_trip_places')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Travelon_Server",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "SqlServerTable",
-				"schema": [
-					{
-						"name": "PlaceId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "PlaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "City",
-						"type": "varchar"
-					},
-					{
-						"name": "State",
-						"type": "varchar"
-					},
-					{
-						"name": "Country",
-						"type": "varchar"
-					},
-					{
-						"name": "Latitude",
-						"type": "decimal",
-						"precision": 9,
-						"scale": 6
-					},
-					{
-						"name": "Longitude",
-						"type": "decimal",
-						"precision": 9,
-						"scale": 6
-					},
-					{
-						"name": "Description",
-						"type": "varchar"
-					},
-					{
-						"name": "GeofenceRadiusMeters",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "TravelonLocation",
-					"table": "TouristPlace"
 				}
 			},
 			"dependsOn": [

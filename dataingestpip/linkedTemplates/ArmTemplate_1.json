@@ -13,6 +13,68 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_sql_trip_places')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Travelon_Server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "PlaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PlaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "City",
+						"type": "varchar"
+					},
+					{
+						"name": "State",
+						"type": "varchar"
+					},
+					{
+						"name": "Country",
+						"type": "varchar"
+					},
+					{
+						"name": "Latitude",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "Longitude",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "Description",
+						"type": "varchar"
+					},
+					{
+						"name": "GeofenceRadiusMeters",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "TravelonLocation",
+					"table": "TouristPlace"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_sql_trip_req_place')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -701,6 +763,60 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "module_2_silver",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "cpy_danger_place",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/silver/silver_layer_module2"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "module_2_gold",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "module_2_silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/gold/gold_layer_module2"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -836,7 +952,239 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_sql_trip_req_place')]"
+				"[concat(variables('factoryId'), '/datasets/ds_sql_trip_req_place')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sql_trip_places')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_orchestrator_runtime')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "latest_location",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_incremental_latest_location",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "module_1_silver",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "latest_location",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/silver/silver_module_1.py"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "module_1_gold",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "module_1_silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/gold/gold_module_1"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "geo_pipeline",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_incremental_geofence_alert",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "module_1_geo_silver",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "geo_pipeline",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/silver/silver_module_geo"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "module_1_geo_gold",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "module_1_geo_silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/gold/gold_module_geo"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "tourist_adhersion",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_trip_adherence_ingestion",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "module_3_silver",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "tourist_adhersion",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/silver/silver_module_3"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "module_3_gold",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "module_3_silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/lakshmananletchu8@gmail.com/de-project/databricks/gold/gold_layer_module3"
+						},
+						"linkedServiceName": {
+							"referenceName": "Travelon_Databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_incremental_latest_location')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_incremental_geofence_alert')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_trip_adherence_ingestion')]"
 			]
 		},
 		{
@@ -907,7 +1255,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -929,6 +1277,37 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/pl_master_ingestion')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/orchestrator')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "pl_orchestrator_runtime",
+						"type": "PipelineReference"
+					},
+					"parameters": {}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 15,
+					"startTime": "2026-05-14T13:31:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pl_orchestrator_runtime')]"
 			]
 		}
 	]
