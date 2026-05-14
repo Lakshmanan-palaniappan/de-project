@@ -2,7 +2,7 @@
 	"name": "orchestrator",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Stopped",
+		"runtimeState": "Started",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "pl_orchestrator_runtime",
